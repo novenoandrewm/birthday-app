@@ -1,0 +1,10 @@
+:root {
+  --color-bg: #020617;
+  --color-bg-soft: #0f172a;
+  --color-fg: #f9fafb;
+  --color-accent: #fb7185;
+  --color-accent-soft: rgba(251, 113, 133, 0.18);
+  --color-border-soft: rgba(148, 163, 184, 0.4);
+
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}

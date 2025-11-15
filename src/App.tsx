@@ -1,18 +1,20 @@
 // src/App.tsx
 import React from 'react'
-import AppRouter from './router'
-import SkipToContentLink from './components/a11y/SkipToContentLink'
-import PageShell from './components/layout/PageShell'
-import { PersonalizationProvider } from './context/PersonalizationContext'
+import HeroIntro from './sections/HeroIntro'
+import RomanticMessage from './sections/RomanticMessage'
+import ReflectionPledge from './sections/ReflectionPledge'
+import CakeFinale from './sections/CakeFinale'
 
 const App: React.FC = () => {
   return (
-    <PersonalizationProvider>
-      <SkipToContentLink />
-      <PageShell>
-        <AppRouter />
-      </PageShell>
-    </PersonalizationProvider>
+    <div className="app-root">
+      <main className="app-main">
+        <HeroIntro />
+        <RomanticMessage />
+        <ReflectionPledge />
+        <CakeFinale />
+      </main>
+    </div>
   )
 }
 

@@ -2,27 +2,30 @@
 import { useEffect, useState } from 'react'
 
 export const usePrefersReducedMotion = (): boolean => {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+  const [prefers, setPrefers] = useState(false)
 
   useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
       return
     }
 
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-
-    setPrefersReducedMotion(mediaQuery.matches)
-
+    const mql = window.matchMedia('(prefers-reduced-motion: reduce)')
     const handleChange = (event: MediaQueryListEvent) => {
-      setPrefersReducedMotion(event.matches)
+      setPrefers(event.matches)
     }
 
-    mediaQuery.addEventListener('change', handleChange)
+    // nilai awal
+    setPrefers(mql.matches)
 
-    return () => {
-      mediaQuery.removeEventListener('change', handleChange)
+    if (typeof mql.addEventListener === 'function') {
+      mql.addEventListener('change', handleChange)
+      return () => mql.removeEventListener('change', handleChange)
+    } else {
+      // fallback browser lama
+      mql.addListener(handleChange)
+      return () => mql.removeListener(handleChange)
     }
   }, [])
 
-  return prefersReducedMotion
+  return prefers
 }
