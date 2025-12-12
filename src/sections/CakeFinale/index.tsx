@@ -1,19 +1,34 @@
 // src/sections/CakeFinale/index.tsx
 import React, { useEffect, useState } from 'react'
 import { COPY } from '../../config/copy'
-import SceneCanvas from '../../three/core/SceneCanvas'
 import { useRevealOnScroll } from '../../hooks/useRevealOnScroll'
 
-const CakeFinale: React.FC = () => {
-  const finale = COPY.finale
-  const [hasBlown, setHasBlown] = useState(false)
-  const [showHint, setShowHint] = useState(true)
-  const { ref, isVisible } = useRevealOnScroll<HTMLElement>()
+type CakeFinaleProps = {
+  hasBlown: boolean
+}
 
+const CakeFinale: React.FC<CakeFinaleProps> = ({ hasBlown }) => {
+  const finale = COPY.finale
+  const { ref, isVisible } = useRevealOnScroll<HTMLElement>()
+  const [showHint, setShowHint] = useState(true)
+
+  // Hint otomatis hilang setelah beberapa detik
   useEffect(() => {
     const timer = setTimeout(() => setShowHint(false), 5000)
     return () => clearTimeout(timer)
   }, [])
+
+  // Begitu lilin ditiup, paksa hint hilang
+  useEffect(() => {
+    if (hasBlown) {
+      setShowHint(false)
+    }
+  }, [hasBlown])
+
+  // Kalimat utama yang muncul di samping judul
+  const lineText = hasBlown
+    ? 'Yeeeyyy, Happy Birthday! Semoga semua harapan yang kamu simpan dalam hati pelan-pelan jadi kenyataan.'
+    : finale.description
 
   return (
     <section
@@ -24,29 +39,22 @@ const CakeFinale: React.FC = () => {
         isVisible ? 'is-visible' : ''
       }`}
     >
-      <h2 id="finale-title" className="section-title">
-        {finale.title}
+      {/* SATU BARIS: Closing – kalimat penutup */}
+      <h2
+        id="finale-title"
+        className="section-title section-title-inline"
+      >
+        <span className="section-title-main">{finale.title}</span>
+        <span className="section-title-separator">–</span>
+        <span className="section-title-sub">{lineText}</span>
       </h2>
 
-      <p className="section-text">
-        {hasBlown
-          ? 'Yeeeyyy, Happy Birthday! The candle is out — I really hope your wish comes true.'
-          : finale.description}
-      </p>
-
       {showHint && !hasBlown && (
-        <p className="section-hint">
-          Tiup lilinnya dengan mengetuk kuenya (tap/click di area 3D) ✨
-        </p>
+        <p className="section-hint">Tiup lilinnya ✨</p>
       )}
 
-      <SceneCanvas
-        blown={hasBlown}
-        onBlow={() => {
-          setHasBlown(true)
-          setShowHint(false)
-        }}
-      />
+      {/* Frame kosong supaya layout tetap seimbang */}
+      <div className="scene-placeholder scene-placeholder--overlay" />
     </section>
   )
 }

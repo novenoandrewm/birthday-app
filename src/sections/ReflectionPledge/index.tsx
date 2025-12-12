@@ -7,6 +7,10 @@ const ReflectionPledge: React.FC = () => {
   const { ref, isVisible } = useRevealOnScroll<HTMLElement>()
   const reflection = COPY.reflection
 
+  const { title, paragraphs } = reflection
+  const firstLine = paragraphs[0] ?? ''
+  const restParagraphs = paragraphs.slice(1)
+
   return (
     <section
       id="reflection-pledge"
@@ -16,10 +20,22 @@ const ReflectionPledge: React.FC = () => {
         isVisible ? 'is-visible' : ''
       }`}
     >
-      <h2 id="reflection-title" className="section-title">
-        {reflection.title}
+      {/* SATU BARIS: Part 2 – isi kalimat pertama */}
+      <h2
+        id="reflection-title"
+        className="section-title section-title-inline"
+      >
+        <span className="section-title-main">{title}</span>
+        {firstLine && (
+          <>
+            <span className="section-title-separator">–</span>
+            <span className="section-title-sub">{firstLine}</span>
+          </>
+        )}
       </h2>
-      {reflection.paragraphs.map((p, idx) => (
+
+      {/* Kalau kamu isi paragraf kedua, ketiga, dst, muncul di bawahnya */}
+      {restParagraphs.map((p, idx) => (
         <p key={idx} className="section-text">
           {p}
         </p>

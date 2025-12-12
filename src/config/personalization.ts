@@ -11,7 +11,7 @@ export interface PersonConfig {
 }
 
 export const PERSON: PersonConfig = {
-  name: 'Nama Lengkap Penerima',
+  name: 'Nama Penerima',
   nickname: 'Panggilan khusus jika ada',
   birthday: '2025-12-31',
   pronouns: 'she/her',

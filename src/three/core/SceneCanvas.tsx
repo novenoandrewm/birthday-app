@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import BirthdayCake from '../objects/BirthdayCake'
@@ -13,6 +13,13 @@ export type SceneCanvasProps = {
 
 const SceneCanvas: React.FC<SceneCanvasProps> = ({ onBlow, blown }) => {
   const reduceMotion = usePrefersReducedMotion()
+
+  // Selalu fungsi: di dalamnya baru cek onBlow optional
+  const handleBlow = useCallback(() => {
+    if (onBlow) {
+      onBlow()
+    }
+  }, [onBlow])
 
   return (
     <div className="scene-placeholder">
@@ -31,9 +38,10 @@ const SceneCanvas: React.FC<SceneCanvasProps> = ({ onBlow, blown }) => {
         />
 
         <BalloonsRing radius={1.6} count={8} reduceMotion={reduceMotion} />
-        <BirthdayCake onBlow={onBlow} reduceMotion={reduceMotion} />
+        {/* di sini sudah pasti tipe () => void */}
+        <BirthdayCake onBlow={handleBlow} reduceMotion={reduceMotion} />
 
-        {!reduceMotion && blown && <ConfettiBurst active={blown} />}
+        {!reduceMotion && !!blown && <ConfettiBurst active={!!blown} />}
 
         <OrbitControls
           enableZoom={false}

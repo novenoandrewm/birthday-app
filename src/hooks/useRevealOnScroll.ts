@@ -1,34 +1,33 @@
+// src/hooks/useRevealOnScroll.ts
 import { useEffect, useRef, useState } from 'react'
-import { usePrefersReducedMotion } from './usePrefersReducedMotion'
 
 export const useRevealOnScroll = <T extends HTMLElement>() => {
   const ref = useRef<T | null>(null)
   const [isVisible, setIsVisible] = useState(false)
-  const prefersReducedMotion = usePrefersReducedMotion()
 
   useEffect(() => {
-    // Kalau user minta reduce motion, langsung tampil tanpa animasi scroll
-    if (prefersReducedMotion) {
-      setIsVisible(true)
-      return
-    }
-
-    if (!ref.current) return
+    const node = ref.current
+    if (!node || typeof window === 'undefined') return
 
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-          observer.disconnect()
-        }
+      (entries) => {
+        entries.forEach((entry) => {
+          // true kalau cukup masuk viewport, false kalau keluar lagi
+          setIsVisible(entry.isIntersecting)
+        })
       },
-      { threshold: 0.2 },
+      {
+        threshold: 0.3,            // ~30% elemen masuk viewport baru dianggap "kelihatan"
+        rootMargin: '-10% 0px -10% 0px', // bikin trigger sedikit lebih lembut
+      }
     )
 
-    observer.observe(ref.current)
+    observer.observe(node)
 
-    return () => observer.disconnect()
-  }, [prefersReducedMotion])
+    return () => {
+      observer.disconnect()
+    }
+  }, [])
 
   return { ref, isVisible }
 }

@@ -1,3 +1,4 @@
+// src/sections/RomanticMessage/index.tsx
 import React from 'react'
 import { COPY } from '../../config/copy'
 import { useRevealOnScroll } from '../../hooks/useRevealOnScroll'
@@ -5,6 +6,10 @@ import { useRevealOnScroll } from '../../hooks/useRevealOnScroll'
 const RomanticMessage: React.FC = () => {
   const { ref, isVisible } = useRevealOnScroll<HTMLElement>()
   const romantic = COPY.romantic
+
+  const { title, paragraphs } = romantic
+  const firstLine = paragraphs[0] ?? ''
+  const restParagraphs = paragraphs.slice(1)
 
   return (
     <section
@@ -15,10 +20,22 @@ const RomanticMessage: React.FC = () => {
         isVisible ? 'is-visible' : ''
       }`}
     >
-      <h2 id="romantic-title" className="section-title">
-        {romantic.title}
+      {/* SATU BARIS: Part 1 – fill it yourself */}
+      <h2
+        id="romantic-title"
+        className="section-title section-title-inline"
+      >
+        <span className="section-title-main">{title}</span>
+        {firstLine && (
+          <>
+            <span className="section-title-separator">–</span>
+            <span className="section-title-sub">{firstLine}</span>
+          </>
+        )}
       </h2>
-      {romantic.paragraphs.map((p, idx) => (
+
+      {/* Kalau nanti ada paragraf tambahan, baru muncul di bawah */}
+      {restParagraphs.map((p, idx) => (
         <p key={idx} className="section-text">
           {p}
         </p>
