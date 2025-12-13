@@ -1,41 +1,41 @@
-// src/hooks/useActiveSection.ts
-import { useEffect, useRef, useState } from 'react'
+// src/hooks/useActiveSection.tsx
+import { useEffect, useState } from 'react'
 
+/**
+ * Menentukan section aktif berdasarkan posisi scroll.
+ * Section dianggap aktif jika bagian atasnya berada di atas 35% tinggi viewport.
+ */
 export function useActiveSection(ids: string[]) {
-  const [activeId, setActiveId] = useState(ids[0] ?? 'hero')
-  const activeRef = useRef(activeId)
-  activeRef.current = activeId
+  const [activeId, setActiveId] = useState(ids[0] ?? '')
 
   useEffect(() => {
     if (!ids.length) return
 
-    const els = ids
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => Boolean(el))
+    const update = () => {
+      const marker = window.innerHeight * 0.35
+      let current = ids[0]
+      ids.forEach((id) => {
+        const el = document.getElementById(id)
+        if (el) {
+          const top = el.getBoundingClientRect().top
+          // jika bagian atas section sudah lewat marker, jadikan aktif
+          if (top - marker <= 0) {
+            current = id
+          }
+        }
+      })
+      setActiveId(current)
+    }
 
-    if (!els.length) return
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        const best = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => (b.intersectionRatio ?? 0) - (a.intersectionRatio ?? 0))[0]
-
-        if (!best?.target) return
-        const id = (best.target as HTMLElement).id
-        if (id && id !== activeRef.current) setActiveId(id)
-      },
-      {
-        // “aktif” saat chapter mendekati tengah viewport (feel-nya mirip orbyte)
-        root: null,
-        threshold: [0.25, 0.35, 0.5, 0.65],
-        rootMargin: '-40% 0px -40% 0px',
-      }
-    )
-
-    els.forEach((el) => io.observe(el))
-    return () => io.disconnect()
-  }, [ids.join('|')])
+    update()
+    // Dengarkan scroll dan resize supaya aktifId langsung diperbarui
+    window.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', update)
+    return () => {
+      window.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
+    }
+  }, [ids])
 
   return activeId
 }
