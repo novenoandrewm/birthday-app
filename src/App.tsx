@@ -31,29 +31,26 @@ const App: React.FC = () => {
 
   // LINE bawah ala Orbyte: berubah sesuai section aktif
   const hudLine = useMemo(() => {
-    const safe = (s?: string) => (s ?? '').trim()
+  const safe = (s?: string) => (s ?? '').trim()
 
-    if (activeId === 'romantic-message') {
-      const first = romantic.paragraphs?.[0]
-      return safe(`${romantic.title}${first ? ` — ${first}` : ''}`)
-    }
+  if (activeId === 'romantic-message') {
+    const first = romantic.paragraphs?.[0]
+    return safe(`${romantic.title}${first ? ` — ${first}` : ''}`)
+  }
 
-    if (activeId === 'reflection-pledge') {
-      const first = reflection.paragraphs?.[0]
-      return safe(`${reflection.title}${first ? ` — ${first}` : ''}`)
-    }
+  if (activeId === 'reflection-pledge') {
+    const first = reflection.paragraphs?.[0]
+    return safe(`${reflection.title}${first ? ` — ${first}` : ''}`)
+  }
 
-    if (activeId === 'cake-finale') {
-      const lineText = hasBlown
-        ? 'Yeeeyyy! Semoga semua harapan kamu pelan-pelan jadi kenyataan.'
-        : safe(finale.description)
+  if (activeId === 'cake-finale') {
+    const first = finale.paragraphs?.[0]
+    const lineText = hasBlown ? 'Yeeeyyy! Wish granted ✨' : first
+    return safe(`${finale.title}${lineText ? ` — ${lineText}` : ''}`)
+  }
 
-      return safe(`${finale.title}${lineText ? ` — ${lineText}` : ''}`)
-    }
-
-    // hero
-    return safe(hero.subtitle)
-  }, [activeId, hasBlown, romantic, reflection, finale, hero.subtitle])
+  return safe(hero.subtitle)
+}, [activeId, hasBlown, romantic, reflection, finale, hero.subtitle])
 
   return (
     <div className="app-root">
