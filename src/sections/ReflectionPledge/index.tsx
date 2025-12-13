@@ -7,39 +7,25 @@ const ReflectionPledge: React.FC = () => {
   const { ref, isVisible } = useRevealOnScroll<HTMLElement>()
   const reflection = COPY.reflection
 
-  const { title, paragraphs } = reflection
-  const firstLine = paragraphs[0] ?? ''
-  const restParagraphs = paragraphs.slice(1)
+  const paragraphs = reflection.paragraphs ?? []
+  const bodyParagraphs = paragraphs.length > 1 ? paragraphs.slice(1) : paragraphs
 
   return (
     <section
       id="reflection-pledge"
       ref={ref}
+      className="page"
       aria-labelledby="reflection-title"
-      className={`section section-reflection fade-in-up ${
-        isVisible ? 'is-visible' : ''
-      }`}
     >
-      {/* SATU BARIS: Part 2 – isi kalimat pertama */}
-      <h2
-        id="reflection-title"
-        className="section-title section-title-inline"
-      >
-        <span className="section-title-main">{title}</span>
-        {firstLine && (
-          <>
-            <span className="section-title-separator">–</span>
-            <span className="section-title-sub">{firstLine}</span>
-          </>
-        )}
-      </h2>
+      <div className={`page-content fade-in-up ${isVisible ? 'is-visible' : ''}`}>
+        <h2 id="reflection-title" className="sr-only">
+          {reflection.title}
+        </h2>
 
-      {/* Kalau kamu isi paragraf kedua, ketiga, dst, muncul di bawahnya */}
-      {restParagraphs.map((p, idx) => (
-        <p key={idx} className="section-text">
-          {p}
-        </p>
-      ))}
+        {bodyParagraphs.map((p, idx) => (
+          <p key={idx}>{p}</p>
+        ))}
+      </div>
     </section>
   )
 }

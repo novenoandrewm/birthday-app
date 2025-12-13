@@ -7,39 +7,25 @@ const RomanticMessage: React.FC = () => {
   const { ref, isVisible } = useRevealOnScroll<HTMLElement>()
   const romantic = COPY.romantic
 
-  const { title, paragraphs } = romantic
-  const firstLine = paragraphs[0] ?? ''
-  const restParagraphs = paragraphs.slice(1)
+  const paragraphs = romantic.paragraphs ?? []
+  const bodyParagraphs = paragraphs.length > 1 ? paragraphs.slice(1) : paragraphs
 
   return (
     <section
       id="romantic-message"
       ref={ref}
+      className="page"
       aria-labelledby="romantic-title"
-      className={`section section-romantic fade-in-up ${
-        isVisible ? 'is-visible' : ''
-      }`}
     >
-      {/* SATU BARIS: Part 1 – fill it yourself */}
-      <h2
-        id="romantic-title"
-        className="section-title section-title-inline"
-      >
-        <span className="section-title-main">{title}</span>
-        {firstLine && (
-          <>
-            <span className="section-title-separator">–</span>
-            <span className="section-title-sub">{firstLine}</span>
-          </>
-        )}
-      </h2>
+      <div className={`page-content fade-in-up ${isVisible ? 'is-visible' : ''}`}>
+        <h2 id="romantic-title" className="sr-only">
+          {romantic.title}
+        </h2>
 
-      {/* Kalau nanti ada paragraf tambahan, baru muncul di bawah */}
-      {restParagraphs.map((p, idx) => (
-        <p key={idx} className="section-text">
-          {p}
-        </p>
-      ))}
+        {bodyParagraphs.map((p, idx) => (
+          <p key={idx}>{p}</p>
+        ))}
+      </div>
     </section>
   )
 }

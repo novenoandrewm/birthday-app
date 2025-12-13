@@ -1,14 +1,20 @@
 // src/hooks/useActiveSection.ts
 import { useEffect, useState } from 'react'
-import type { SectionItem } from '../config/sections'
+import type { SectionDef } from '../config/sections'
 
-export const useActiveSection = (sections: SectionItem[]) => {
-  const [activeId, setActiveId] = useState(sections[0]?.id ?? '')
+export const useActiveSection = (sections: SectionDef[]) => {
+  const [activeId, setActiveId] = useState(sections[0]?.id ?? 'hero')
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
+    const els = sections
+      .map((s) => document.getElementById(s.id))
+      .filter(Boolean) as HTMLElement[]
+
+    if (!els.length) return
+
+    const obs = new IntersectionObserver(
       (entries) => {
-        // cari entry yang paling “kuat” terlihat
+        // pilih yang paling “dominan” di viewport
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => (b.intersectionRatio ?? 0) - (a.intersectionRatio ?? 0))[0]
@@ -16,17 +22,12 @@ export const useActiveSection = (sections: SectionItem[]) => {
         if (visible?.target?.id) setActiveId(visible.target.id)
       },
       {
-        threshold: [0.25, 0.4, 0.6, 0.75],
-        rootMargin: '-10% 0px -30% 0px',
+        threshold: [0.55, 0.65, 0.75],
       }
     )
 
-    sections.forEach(({ id }) => {
-      const el = document.getElementById(id)
-      if (el) observer.observe(el)
-    })
-
-    return () => observer.disconnect()
+    els.forEach((el) => obs.observe(el))
+    return () => obs.disconnect()
   }, [sections])
 
   return activeId

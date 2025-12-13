@@ -21,37 +21,34 @@ const App: React.FC = () => {
   const scrollProgress = useScrollProgress()
   const [hasBlown, setHasBlown] = useState(false)
 
-  // section aktif (sinkron scroll + tombol)
+  // Track which section is currently in view (controlled by IntersectionObserver)
   const activeId = useActiveSection(SECTIONS)
 
-  // ===== label kanan bawah: JANGAN PERNAH KOSONG =====
+  // Bottom‑right label: use section label if available, otherwise default to the recipient’s name
   const recipientName = useMemo(
     () => (COPY.hero.recipient ?? 'NAMA PENERIMA').toUpperCase(),
     []
   )
-
-  const sectionLabel = (SECTIONS.find((s) => s.id === activeId)?.label ?? '').toUpperCase()
+  const sectionLabel = (SECTIONS.find(s => s.id === activeId)?.label ?? '').toUpperCase()
   const activeLabel = sectionLabel || recipientName
 
-  // ===== header kiri atas: DINAMIS seperti orbyte =====
+  // Dynamic header in the top‑left overlay
   const header = useMemo(() => {
-    // eyebrow tetap (BIRTHDAY MOMENT) biar konsisten seperti style orbyte kamu
     const eyebrow = (COPY.hero.eyebrow ?? 'BIRTHDAY MOMENT').toUpperCase()
-
     if (activeId === 'romantic-message') {
       return { eyebrow, title: 'HAPPY BIRTHDAY', line: 'Part 1 – fill it yourself' }
     }
-
     if (activeId === 'reflection-pledge') {
       return { eyebrow, title: 'HAPPY BIRTHDAY', line: 'Part 2 – Fill it yourself' }
     }
-
     if (activeId === 'cake-finale') {
       return { eyebrow, title: 'HAPPY BIRTHDAY', line: 'Closing – make a wish' }
     }
-
-    // default hero
-    return { eyebrow, title: (COPY.hero.title ?? 'HAPPY BIRTHDAY').toUpperCase(), line: '' }
+    return {
+      eyebrow,
+      title: (COPY.hero.title ?? 'HAPPY BIRTHDAY').toUpperCase(),
+      line: '',
+    }
   }, [activeId])
 
   return (
@@ -64,19 +61,13 @@ const App: React.FC = () => {
         onBlow={() => setHasBlown(true)}
       />
 
-      {/* Overlay kiri atas — DINAMIS */}
+      {/* Dynamic overlay at top‑left */}
       <div className="hero-overlay">
         <div className="hero-overlay-inner">
           <div className="hero-chapter">
             <p className="section-eyebrow hero-eyebrow">{header.eyebrow}</p>
-
             <h1 className="section-title hero-title">{header.title}</h1>
-
-            {header.line && (
-              <p className="hero-inline-line">
-                {header.line}
-              </p>
-            )}
+            {header.line && <p className="hero-inline-line">{header.line}</p>}
           </div>
         </div>
       </div>
@@ -88,7 +79,7 @@ const App: React.FC = () => {
         <CakeFinale hasBlown={hasBlown} />
       </main>
 
-      {/* kanan bawah — SELALU ADA & IKUT section aktif */}
+      {/* Bottom‑right label that follows the active section */}
       <div className="hero-recipient-tag">{activeLabel}</div>
 
       <NavigationButtons />
