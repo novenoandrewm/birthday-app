@@ -2,7 +2,7 @@
 import React from 'react'
 
 const HeroIntro: React.FC = () => {
-  return <section id="hero" className="page page--hero" aria-label="Hero" />
+  return <section id="hero" className="chapter" aria-label="Hero" />
 }
 
 export default HeroIntro

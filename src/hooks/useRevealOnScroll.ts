@@ -1,33 +1,61 @@
 // src/hooks/useRevealOnScroll.ts
 import { useEffect, useRef, useState } from 'react'
 
-export const useRevealOnScroll = <T extends HTMLElement>() => {
+type Options = {
+  once?: boolean
+  threshold?: number
+  rootMargin?: string
+}
+
+/**
+ * Reveal ketika elemen sudah "cukup" masuk viewport.
+ * Dibuat lebih forgiving supaya saat scrollTo (NavigationButtons)
+ * konten langsung muncul tanpa harus scroll lagi.
+ */
+export function useRevealOnScroll<T extends HTMLElement>(
+  options: Options = {}
+) {
+  const {
+    once = true,
+    threshold = 0.01,
+    rootMargin = '0px 0px -15% 0px',
+  } = options
+
   const ref = useRef<T | null>(null)
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
-    const node = ref.current
-    if (!node || typeof window === 'undefined') return
+    const el = ref.current
+    if (!el) return
 
-    const observer = new IntersectionObserver(
+    const checkImmediate = () => {
+      const r = el.getBoundingClientRect()
+      const inView = r.top < window.innerHeight * 0.9 && r.bottom > 0
+      if (inView) setIsVisible(true)
+    }
+
+    checkImmediate()
+
+    const io = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          // true kalau cukup masuk viewport, false kalau keluar lagi
-          setIsVisible(entry.isIntersecting)
-        })
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            setIsVisible(true)
+            if (once) io.disconnect()
+          }
+        }
       },
-      {
-        threshold: 0.3,            // ~30% elemen masuk viewport baru dianggap "kelihatan"
-        rootMargin: '-10% 0px -10% 0px', // bikin trigger sedikit lebih lembut
-      }
+      { threshold, rootMargin }
     )
 
-    observer.observe(node)
+    io.observe(el)
+    window.addEventListener('resize', checkImmediate)
 
     return () => {
-      observer.disconnect()
+      io.disconnect()
+      window.removeEventListener('resize', checkImmediate)
     }
-  }, [])
+  }, [once, threshold, rootMargin])
 
   return { ref, isVisible }
 }

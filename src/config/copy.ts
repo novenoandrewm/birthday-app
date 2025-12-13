@@ -1,4 +1,5 @@
 // src/config/copy.ts
+import { PERSON } from './personalization'
 
 export type SectionCopy = {
   title: string
@@ -12,6 +13,12 @@ export type HeroCopy = {
   recipient?: string
 }
 
+// ✅ GANTI INI untuk paksa nama dari copy.ts (paling simpel)
+const RECIPIENT_OVERRIDE = 'Nama Penerima Kamu'
+
+const personName = (PERSON?.name ?? '').trim()
+const recipient = (RECIPIENT_OVERRIDE ?? '').trim() || personName || 'Recipient Name'
+
 export const COPY: {
   hero: HeroCopy
   romantic: SectionCopy
@@ -21,16 +28,14 @@ export const COPY: {
   hero: {
     eyebrow: 'Birthday Moment',
     title: 'Happy Birthday',
-    subtitle: 'Hari ini tentang kamu',
-    recipient: 'Recipient Name',
+    subtitle: 'Today is your special day!',
+    recipient: 'Recipient Name', 
   },
 
   romantic: {
     title: 'Part 1',
     paragraphs: [
-      // HUD line (Part 1 — ...)
       'fill it yourself',
-      // Card content (tampil di page)
       'Tulis paragraf Part 1 kamu di sini.',
       'Kalau mau tambah, ini paragraf kedua (opsional).',
     ],
@@ -45,12 +50,13 @@ export const COPY: {
     ],
   },
 
+  // ✅ Closing sekarang layout-nya sama seperti Part 1/2:
+  // line 0 = subtitle (muncul di HUD)
+  // sisanya = muncul di panel kiri-bawah
   finale: {
     title: 'Closing',
     paragraphs: [
-      // HUD line (Closing — ...)
-      'Kalimat penutup singkat setelah lilin padam dan konfeti keluar.',
-      // Card content (tampil di page)
+      'Kalimat penutup',
       'Tulis penutup yang paling kamu di sini.',
       'Boleh tambah paragraf terakhir yang lebih personal (opsional).',
     ],

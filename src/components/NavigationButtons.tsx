@@ -1,65 +1,64 @@
 // src/components/NavigationButtons.tsx
 import React, { useCallback, useMemo } from 'react'
-import { SECTIONS, type SectionDef } from '../config/sections'
-import { useActiveSection } from '../hooks/useActiveSection'
+import type { Section } from '../config/sections'
 
 type Props = {
-  sections?: SectionDef[]
-  activeId?: string
+  sections: Section[]
+  activeId: string
+  onNavigate?: (id: string) => void
 }
 
-const prefersReducedMotion = () =>
-  window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false
+const clamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min), max)
 
-const NavigationButtons: React.FC<Props> = ({ sections, activeId }) => {
-  // fallback supaya gak pernah undefined
-  const safeSections = sections && sections.length ? sections : SECTIONS
+const scrollToId = (id: string) => {
+  const el = document.getElementById(id)
+  if (!el) return
+  // CSS scroll-margin-top di .chapter akan ngasih “offset” otomatis
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
 
-  // selalu panggil hook (aturan React hooks)
-  const observedActiveId = useActiveSection(safeSections)
-  const finalActiveId = activeId ?? observedActiveId
+const NavigationButtons: React.FC<Props> = ({ sections, activeId, onNavigate }) => {
+  const idx = useMemo(() => {
+    if (!sections?.length) return 0
+    const found = sections.findIndex((s) => s.id === activeId)
+    return found >= 0 ? found : 0
+  }, [sections, activeId])
 
-  const currentIndex = useMemo(() => {
-    const i = safeSections.findIndex((s) => s.id === finalActiveId)
-    return i < 0 ? 0 : i
-  }, [safeSections, finalActiveId])
+  const canUp = idx > 0
+  const canDown = idx < sections.length - 1
 
-  const goToIndex = useCallback(
-    (index: number) => {
-      const target = safeSections[index]
+  const go = useCallback(
+    (nextIdx: number) => {
+      if (!sections?.length) return
+      const safeIdx = clamp(nextIdx, 0, sections.length - 1)
+      const target = sections[safeIdx]
       if (!target) return
-      const el = document.getElementById(target.id)
-      if (!el) return
 
-      el.scrollIntoView({
-        behavior: prefersReducedMotion() ? 'auto' : 'smooth',
-        block: 'start',
-      })
+      // penting: update UI dulu biar panel/heading langsung ganti
+      onNavigate?.(target.id)
+      scrollToId(target.id)
     },
-    [safeSections]
+    [sections, onNavigate]
   )
-
-  const canPrev = currentIndex > 0
-  const canNext = currentIndex < safeSections.length - 1
 
   return (
     <div className="nav-buttons" aria-label="Section navigation">
       <button
         type="button"
-        onClick={() => goToIndex(currentIndex - 1)}
-        disabled={!canPrev}
+        className="nav-btn"
         aria-label="Previous section"
-        title="Previous"
+        disabled={!canUp}
+        onClick={() => go(idx - 1)}
       >
         ↑
       </button>
 
       <button
         type="button"
-        onClick={() => goToIndex(currentIndex + 1)}
-        disabled={!canNext}
+        className="nav-btn"
         aria-label="Next section"
-        title="Next"
+        disabled={!canDown}
+        onClick={() => go(idx + 1)}
       >
         ↓
       </button>
