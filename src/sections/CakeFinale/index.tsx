@@ -1,20 +1,16 @@
 // src/sections/CakeFinale/index.tsx
 import React, { useEffect, useState } from 'react'
-import { COPY } from '../../config/copy'
 import { useRevealOnScroll } from '../../hooks/useRevealOnScroll'
 
-type CakeFinaleProps = {
-  hasBlown: boolean
-}
+type Props = { hasBlown: boolean }
 
-const CakeFinale: React.FC<CakeFinaleProps> = ({ hasBlown }) => {
-  const finale = COPY.finale
+const CakeFinale: React.FC<Props> = ({ hasBlown }) => {
   const { ref, isVisible } = useRevealOnScroll<HTMLElement>()
   const [showHint, setShowHint] = useState(true)
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowHint(false), 4500)
-    return () => clearTimeout(timer)
+    const t = setTimeout(() => setShowHint(false), 4500)
+    return () => clearTimeout(t)
   }, [])
 
   useEffect(() => {
@@ -23,17 +19,17 @@ const CakeFinale: React.FC<CakeFinaleProps> = ({ hasBlown }) => {
 
   return (
     <section id="cake-finale" ref={ref} className="page" aria-label="Finale">
+      <h2 className="sr-only">Closing</h2>
+
       <div className={`page-content fade-in-up ${isVisible ? 'is-visible' : ''}`}>
         {!hasBlown && showHint && (
-          <p>
-            <strong>{finale.title ?? 'Closing'}:</strong> {finale.description ?? 'Tiup / tap lilinnya ✨'}
+          <p className="page-text">
+            <strong>Hint:</strong> tiup / tap lilinnya ✨
           </p>
         )}
-
         {hasBlown && (
-          <p>
-            <strong>{finale.title ?? 'Closing'}:</strong>{' '}
-            Yeeeyyy, Happy Birthday! Semoga semua harapan kamu pelan-pelan jadi kenyataan.
+          <p className="page-text">
+            <strong>Selesai.</strong> Kamu bisa ganti kalimat penutupnya di App.tsx (hudLine).
           </p>
         )}
       </div>

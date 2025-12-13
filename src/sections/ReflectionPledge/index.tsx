@@ -7,24 +7,27 @@ const ReflectionPledge: React.FC = () => {
   const { ref, isVisible } = useRevealOnScroll<HTMLElement>()
   const reflection = COPY.reflection
 
-  const paragraphs = reflection.paragraphs ?? []
-  const bodyParagraphs = paragraphs.length > 1 ? paragraphs.slice(1) : paragraphs
+  const rest = (reflection.paragraphs ?? []).slice(1).filter(Boolean)
 
   return (
     <section
       id="reflection-pledge"
       ref={ref}
       className="page"
-      aria-labelledby="reflection-title"
+      aria-label={reflection.title}
     >
-      <div className={`page-content fade-in-up ${isVisible ? 'is-visible' : ''}`}>
-        <h2 id="reflection-title" className="sr-only">
-          {reflection.title}
-        </h2>
+      <h2 className="sr-only">{reflection.title}</h2>
 
-        {bodyParagraphs.map((p, idx) => (
-          <p key={idx}>{p}</p>
-        ))}
+      <div className={`page-content fade-in-up ${isVisible ? 'is-visible' : ''}`}>
+        {rest.length ? (
+          rest.map((p, i) => (
+            <p key={i} className="page-text">
+              {p}
+            </p>
+          ))
+        ) : (
+          <p className="page-text is-dim">Isi pesan Part 2 di config/copy.ts ✍️</p>
+        )}
       </div>
     </section>
   )

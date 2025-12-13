@@ -27,30 +27,40 @@ export const COPY: {
   hero: {
     eyebrow: 'Birthday Moment',
     title: 'Happy Birthday',
-    subtitle:
-      '',
-    recipient: PERSON?.name ?? 'Nama Penerima',
+
+    // Ini yang tampil di HUD line saat page pertama (hero)
+    subtitle: 'Hari ini tentang kamu',
+
+    // Nama penerima (pojok kanan bawah)
+    recipient: PERSON?.name ?? 'Recipient Name',
   },
 
   romantic: {
     title: 'Part 1',
+
+    // paragraphs[0] = subline untuk HUD (Part 1 — ...)
+    // paragraphs[1..] = isi teks yang tampil di card (page-content)
     paragraphs: [
-      // isi dengan paragraf kamu sendiri, contoh:
       'fill it yourself',
+      'Tulis paragraf pertama pesan romantis kamu di sini.',
+      'Kalau mau tambah, ini paragraf kedua (opsional).',
     ],
   },
 
   reflection: {
     title: 'Part 2',
     paragraphs: [
-      // boleh kosong atau kamu isi nanti
-      'Fill it yourself'
+      'Fill it yourself',
+      'Tulis bagian refleksi / janji / harapan kamu di sini.',
+      'Boleh tambah paragraf lagi kalau perlu.',
     ],
   },
 
   finale: {
     title: 'Closing',
+
+    // Ini dipakai HUD line saat closing sebelum lilin ditiup
     description:
-      'Di sini nanti bisa jadi kalimat penutup singkat setelah lilin padam dan konfeti keluar.',
+      'Kalimat penutup singkat setelah lilin padam dan konfeti keluar.',
   },
 }

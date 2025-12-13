@@ -7,24 +7,23 @@ const RomanticMessage: React.FC = () => {
   const { ref, isVisible } = useRevealOnScroll<HTMLElement>()
   const romantic = COPY.romantic
 
-  const paragraphs = romantic.paragraphs ?? []
-  const bodyParagraphs = paragraphs.length > 1 ? paragraphs.slice(1) : paragraphs
+  // baris pertama dipakai HUD, sisanya baru tampil di content
+  const rest = (romantic.paragraphs ?? []).slice(1).filter(Boolean)
 
   return (
-    <section
-      id="romantic-message"
-      ref={ref}
-      className="page"
-      aria-labelledby="romantic-title"
-    >
-      <div className={`page-content fade-in-up ${isVisible ? 'is-visible' : ''}`}>
-        <h2 id="romantic-title" className="sr-only">
-          {romantic.title}
-        </h2>
+    <section id="romantic-message" ref={ref} className="page" aria-label={romantic.title}>
+      <h2 className="sr-only">{romantic.title}</h2>
 
-        {bodyParagraphs.map((p, idx) => (
-          <p key={idx}>{p}</p>
-        ))}
+      <div className={`page-content fade-in-up ${isVisible ? 'is-visible' : ''}`}>
+        {rest.length ? (
+          rest.map((p, i) => (
+            <p key={i} className="page-text">
+              {p}
+            </p>
+          ))
+        ) : (
+          <p className="page-text is-dim">Isi pesan Part 1 di config/copy.ts ✍️</p>
+        )}
       </div>
     </section>
   )

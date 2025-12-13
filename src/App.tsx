@@ -3,53 +3,57 @@ import React, { useMemo, useState } from 'react'
 import './styles/globals.css'
 
 import BackgroundMusic from './components/BackgroundMusic'
-import NavigationButtons from './components/NavigationButtons'
-
 import GlobalSceneCanvas from './three/core/GlobalSceneCanvas'
-import { useScrollProgress } from './hooks/useScrollProgress'
 
 import HeroIntro from './sections/HeroIntro'
 import RomanticMessage from './sections/RomanticMessage'
 import ReflectionPledge from './sections/ReflectionPledge'
 import CakeFinale from './sections/CakeFinale'
 
+import NavigationButtons from './components/NavigationButtons'
+
 import { COPY } from './config/copy'
 import { SECTIONS } from './config/sections'
+import { useScrollProgress } from './hooks/useScrollProgress'
 import { useActiveSection } from './hooks/useActiveSection'
 
 const App: React.FC = () => {
   const scrollProgress = useScrollProgress()
   const [hasBlown, setHasBlown] = useState(false)
 
-  // Track which section is currently in view (controlled by IntersectionObserver)
+  // active section dari scroll (untuk tombol next/prev + HUD line)
   const activeId = useActiveSection(SECTIONS)
 
-  // Bottom‑right label: use section label if available, otherwise default to the recipient’s name
-  const recipientName = useMemo(
-    () => (COPY.hero.recipient ?? 'NAMA PENERIMA').toUpperCase(),
-    []
-  )
-  const sectionLabel = (SECTIONS.find(s => s.id === activeId)?.label ?? '').toUpperCase()
-  const activeLabel = sectionLabel || recipientName
+  const hero = COPY.hero
+  const romantic = COPY.romantic
+  const reflection = COPY.reflection
+  const finale = COPY.finale
 
-  // Dynamic header in the top‑left overlay
-  const header = useMemo(() => {
-    const eyebrow = (COPY.hero.eyebrow ?? 'BIRTHDAY MOMENT').toUpperCase()
+  // LINE bawah ala Orbyte: berubah sesuai section aktif
+  const hudLine = useMemo(() => {
+    const safe = (s?: string) => (s ?? '').trim()
+
     if (activeId === 'romantic-message') {
-      return { eyebrow, title: 'HAPPY BIRTHDAY', line: 'Part 1 – fill it yourself' }
+      const first = romantic.paragraphs?.[0]
+      return safe(`${romantic.title}${first ? ` — ${first}` : ''}`)
     }
+
     if (activeId === 'reflection-pledge') {
-      return { eyebrow, title: 'HAPPY BIRTHDAY', line: 'Part 2 – Fill it yourself' }
+      const first = reflection.paragraphs?.[0]
+      return safe(`${reflection.title}${first ? ` — ${first}` : ''}`)
     }
+
     if (activeId === 'cake-finale') {
-      return { eyebrow, title: 'HAPPY BIRTHDAY', line: 'Closing – make a wish' }
+      const lineText = hasBlown
+        ? 'Yeeeyyy! Semoga semua harapan kamu pelan-pelan jadi kenyataan.'
+        : safe(finale.description)
+
+      return safe(`${finale.title}${lineText ? ` — ${lineText}` : ''}`)
     }
-    return {
-      eyebrow,
-      title: (COPY.hero.title ?? 'HAPPY BIRTHDAY').toUpperCase(),
-      line: '',
-    }
-  }, [activeId])
+
+    // hero
+    return safe(hero.subtitle)
+  }, [activeId, hasBlown, romantic, reflection, finale, hero.subtitle])
 
   return (
     <div className="app-root">
@@ -61,14 +65,26 @@ const App: React.FC = () => {
         onBlow={() => setHasBlown(true)}
       />
 
-      {/* Dynamic overlay at top‑left */}
-      <div className="hero-overlay">
-        <div className="hero-overlay-inner">
-          <div className="hero-chapter">
-            <p className="section-eyebrow hero-eyebrow">{header.eyebrow}</p>
-            <h1 className="section-title hero-title">{header.title}</h1>
-            {header.line && <p className="hero-inline-line">{header.line}</p>}
+      {/* HUD FIXED (ini yang bikin BIRTHDAY MOMENT / HAPPY BIRTHDAY / NAMA PENERIMA
+          selalu tampil di Part 1 - 4) */}
+      <div className="hud" aria-hidden="true">
+        <div className="hud-left">
+          <div className="hud-eyebrow">
+            {(hero.eyebrow ?? 'Birthday Moment').toUpperCase()}
           </div>
+
+          <div className="hud-heading">
+            {(hero.title ?? 'Happy Birthday').toUpperCase()}
+          </div>
+
+          {/* key biar transisinya halus saat ganti page */}
+          <div key={`${activeId}-${hasBlown ? 'blown' : 'unblown'}`} className="hud-line">
+            {hudLine}
+          </div>
+        </div>
+
+        <div className="hud-recipient">
+          {(hero.recipient ?? 'Nama Penerima').toUpperCase()}
         </div>
       </div>
 
@@ -79,10 +95,7 @@ const App: React.FC = () => {
         <CakeFinale hasBlown={hasBlown} />
       </main>
 
-      {/* Bottom‑right label that follows the active section */}
-      <div className="hero-recipient-tag">{activeLabel}</div>
-
-      <NavigationButtons />
+      <NavigationButtons sections={SECTIONS} activeId={activeId} />
     </div>
   )
 }
