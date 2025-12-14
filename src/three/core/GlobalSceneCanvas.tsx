@@ -1,3 +1,9 @@
+/**
+ * Global R3F canvas that renders the entire 3D birthday scene.
+ * - Drives camera movement, world rotation, and mood lighting based on scrollProgress (with reduced-motion support).
+ * - Renders the main objects (cake, balloons, stars, confetti) plus an HDR environment and extra FX layers.
+ */
+
 // src/three/core/GlobalSceneCanvas.tsx
 import React, { Suspense, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
@@ -12,7 +18,7 @@ import BalloonsRing from '../objects/BalloonsRing'
 import ConfettiBurst from '../objects/ConfettiBurst'
 import StarField from '../objects/StarField'
 import { HdrBackground } from './HdrBackground'
-// ⬇️ SESUAIKAN path ini dengan file SpaceFX kamu
+// ⬇️ Update this import path to match your SpaceFX file location
 import SpaceFX from '../fx/SpaceFX'
 
 type GlobalSceneCanvasProps = {
@@ -21,13 +27,13 @@ type GlobalSceneCanvasProps = {
   onBlow: () => void
 }
 
-// Kamera yang sudah ditune
+// Tuned camera targets per chapter
 const CAM_A = new Vector3(0, 2.4, 11)
 const CAM_B = new Vector3(-3.0, 2.2, 8.5)
 const CAM_C = new Vector3(2.4, 2.0, 6.5)
 const CAM_D = new Vector3(0, 2.0, 6.5)
 
-// Warna mood per chapter
+// Mood colors per chapter
 const HERO_COLOR = new Color('#38bdf8')
 const ROMANTIC_COLOR = new Color('#fb7185')
 const FINALE_COLOR = new Color('#facc15')
@@ -58,11 +64,11 @@ const ScrollWorld: React.FC<ScrollWorldProps> = ({
   useFrame((state, delta) => {
     const rawT = MathUtils.clamp(scrollProgress, 0, 1)
 
-    // --- Posisi kamera & rotasi dunia ---
+    // --- Camera position & world rotation ---
     let chapterRot = 0
 
     if (reduceMotion) {
-      // Parkir di tengah B–C, rotasi pelan
+      // Park between B–C and keep rotation subtle
       lerpVec(camPos, CAM_B, CAM_C, 0.5)
       chapterRot = 0.2
     } else {
@@ -86,7 +92,7 @@ const ScrollWorld: React.FC<ScrollWorldProps> = ({
       }
     }
 
-    // --- Mood color berdasarkan chapter scroll ---
+    // --- Mood color based on scroll chapter ---
     let targetColor: Color
     if (rawT <= 0.3) {
       targetColor = HERO_COLOR
@@ -97,11 +103,11 @@ const ScrollWorld: React.FC<ScrollWorldProps> = ({
     }
 
     if (torusMat.current) {
-      // Transisi warna pelan
+      // Slowly blend emissive color for smoother mood transitions
       torusMat.current.emissive.lerp(targetColor, 0.01)
     }
 
-    // Update kamera
+    // Update camera
     state.camera.position.lerp(camPos, reduceMotion ? 0.15 : 0.08)
     state.camera.lookAt(0, reduceMotion ? 1.2 : 1.4, 0)
 
@@ -112,24 +118,24 @@ const ScrollWorld: React.FC<ScrollWorldProps> = ({
 
   return (
     <group ref={group} position={[0, 0.9, 0]}>
-      {/* --- LIGHTING: supaya cake & balon tidak hitam --- */}
+      {/* --- LIGHTING: keep the cake and balloons readable --- */}
       <ambientLight intensity={0.35} />
 
-      {/* key light dari kanan-atas */}
+      {/* Key light from upper-right */}
       <directionalLight
         intensity={1.2}
         position={[4, 6, 6]}
         color="#ffffff"
       />
 
-      {/* rim light kebiruan dari kiri belakang */}
+      {/* Cool rim light from back-left */}
       <directionalLight
         intensity={0.7}
         position={[-3, 3, -2]}
         color="#38bdf8"
       />
 
-      {/* sedikit warm key dari depan (romantis) */}
+      {/* Warm accent light from the front (romantic tone) */}
       <pointLight
         intensity={0.9}
         distance={12}
@@ -137,14 +143,14 @@ const ScrollWorld: React.FC<ScrollWorldProps> = ({
         color="#fb7185"
       />
 
-      {/* Bintang + nebula di belakang semua elemen */}
+      {/* Stars / nebula background behind everything */}
       <StarField
         key={isMobile ? 'star-mobile' : 'star-desktop'}
         isMobile={isMobile}
         reduceMotion={reduceMotion}
       />
 
-      {/* “Galaksi” torus di belakang kue */}
+      {/* Torus-knot “galaxy” element behind the cake */}
       <mesh position={[0, 0.1, -1.2]}>
         <torusKnotGeometry
           args={[1.6, 0.3, isMobile ? 120 : 200, isMobile ? 24 : 32]}
@@ -159,19 +165,19 @@ const ScrollWorld: React.FC<ScrollWorldProps> = ({
         />
       </mesh>
 
-      {/* Soft glow horizontal di bawah kue */}
+      {/* Soft horizontal glow under the cake */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]}>
         <circleGeometry args={[2.7, 48]} />
         <meshBasicMaterial color="#f97316" transparent opacity={0.18} />
       </mesh>
 
-      {/* Halo vertikal tipis di belakang kue */}
+      {/* Thin vertical halo behind the cake */}
       <mesh position={[0, 1.6, -0.2]}>
         <ringGeometry args={[1.6, 2.0, 64]} />
         <meshBasicMaterial color="#fb7185" transparent opacity={0.24} />
       </mesh>
 
-      {/* Orbit rings tipis */}
+      {/* Thin orbit rings */}
       <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0.3, 0]}>
         <torusGeometry args={[3.4, 0.015, 8, 160]} />
         <meshBasicMaterial color="#38bdf8" transparent opacity={0.45} />
@@ -187,7 +193,7 @@ const ScrollWorld: React.FC<ScrollWorldProps> = ({
         <meshBasicMaterial color="#f97316" transparent opacity={0.32} />
       </mesh>
 
-      {/* Bola-bola bokeh */}
+      {/* Bokeh spheres for depth and ambience */}
       <mesh position={[2.0, 0.6, -1.5]}>
         <sphereGeometry args={[0.45, isMobile ? 20 : 32, isMobile ? 20 : 32]} />
         <meshStandardMaterial
@@ -218,7 +224,7 @@ const ScrollWorld: React.FC<ScrollWorldProps> = ({
         />
       </mesh>
 
-      {/* Kue + balon di pusat dunia */}
+      {/* Main center group: balloons + cake + confetti */}
       <group position={[0, 0, 0]}>
         <BalloonsRing
           radius={1.6}
@@ -250,10 +256,10 @@ const GlobalSceneCanvas: React.FC<GlobalSceneCanvasProps> = ({
         gl={{ antialias: true, alpha: false }}
       >
         <Suspense fallback={null}>
-          {/* HDR background + env map */}
+          {/* HDR background + environment map */}
           <HdrBackground url="/textures/space_nebula_4k.hdr" asBackground />
 
-          {/* Dunia utama yang mengikuti scroll */}
+          {/* Main world that reacts to scroll progress */}
           <ScrollWorld
             scrollProgress={scrollProgress}
             reduceMotion={reduceMotion}
@@ -262,7 +268,7 @@ const GlobalSceneCanvas: React.FC<GlobalSceneCanvasProps> = ({
             isMobile={isMobile}
           />
 
-          {/* Layer efek tambahan (bloom / streaks / dsb) */}
+          {/* Additional post/atmosphere effects layer (bloom, streaks, etc.) */}
           <SpaceFX reduceMotion={reduceMotion} />
         </Suspense>
       </Canvas>

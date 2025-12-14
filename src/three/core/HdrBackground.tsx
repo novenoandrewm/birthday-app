@@ -1,3 +1,9 @@
+/**
+ * Loads an HDR (RGBE) environment texture and applies it to the Three.js scene.
+ * - Sets the texture as the scene environment for realistic reflections/lighting.
+ * - Optionally also sets it as the scene background, and cleans up on unmount.
+ */
+
 // src/three/core/HdrBackground.tsx
 import React, { useEffect } from 'react'
 import { useThree, useLoader } from '@react-three/fiber'
@@ -6,7 +12,7 @@ import { RGBELoader } from 'three-stdlib'
 
 type HdrBackgroundProps = {
   url: string
-  /** true = jadikan juga background, false = cuma environment map */
+  /** true = also use as the background, false = environment map only */
   asBackground?: boolean
 }
 
@@ -18,19 +24,19 @@ export const HdrBackground: React.FC<HdrBackgroundProps> = ({
   const texture = useLoader(RGBELoader, url)
 
   useEffect(() => {
-    // mapping wajib supaya HDR dipakai sebagai equirectangular env map
+    // Required so the HDR is treated as an equirectangular environment map
     texture.mapping = THREE.EquirectangularReflectionMapping
     texture.magFilter = THREE.LinearFilter
     texture.minFilter = THREE.LinearFilter
 
-    // jadikan environment untuk refleksi + depth feel
+    // Apply as environment for reflections and overall lighting
     scene.environment = texture
 
     if (asBackground) {
       scene.background = texture
     }
 
-    // cleanup kalau komponen di-unmount
+    // Cleanup when the component unmounts
     return () => {
       if (scene.environment === texture) scene.environment = null
       if (scene.background === texture) scene.background = null

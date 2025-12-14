@@ -1,10 +1,16 @@
+/**
+ * Procedural starfield + nebula backdrop for the 3D scene.
+ * - Generates two layered point-cloud star fields (near + far) with HSL-based color variation for depth and richness.
+ * - Animates slow rotation (scaled by STAR_SPEED and reduced when reduceMotion is true) and runs two lightweight shader-based nebula planes in the background.
+ */
+
 // src/three/objects/StarField.tsx
 import React, { useMemo, useRef } from 'react'
 import { Color, Group, ShaderMaterial, AdditiveBlending } from 'three'
 import { useFrame } from '@react-three/fiber'
 import { Points } from '@react-three/drei'
 
-// Faktor kecepatan bintang (rotasi). < 1 = lebih pelan.
+// Star rotation speed factor. < 1 = slower.
 const STAR_SPEED = 0.35
 
 type StarFieldProps = {
@@ -13,8 +19,8 @@ type StarFieldProps = {
 }
 
 /**
- * Starfield + nebula ala space.
- * Fokus: visual yang wah, bukan irit resource.
+ * Space-style starfield + nebula.
+ * Focus: strong visuals rather than ultra-minimal resource usage.
  */
 const StarField: React.FC<StarFieldProps> = ({ isMobile, reduceMotion }) => {
   const nearGroup = useRef<Group | null>(null)
@@ -23,7 +29,7 @@ const StarField: React.FC<StarFieldProps> = ({ isMobile, reduceMotion }) => {
   const nebulaMat2 = useRef<ShaderMaterial | null>(null)
 
   const { nearPositions, nearColors, farPositions, farColors } = useMemo(() => {
-    // Jumlah bintang: cukup banyak supaya “wah”
+    // Star count: high enough to feel “wow”
     const mobile = isMobile
 
     const nearCount = mobile ? 2200 : 3800
@@ -47,17 +53,17 @@ const StarField: React.FC<StarFieldProps> = ({ isMobile, reduceMotion }) => {
         const theta = Math.random() * Math.PI * 2
         const phi = Math.acos(2 * Math.random() - 1)
 
-        // Spherical shell di sekitar origin, agak di-flatten
+        // Spherical shell around the origin, slightly flattened on Y
         const x = r * Math.sin(phi) * Math.cos(theta)
         const y = r * Math.sin(phi) * Math.sin(theta) * 0.65
-        const z = r * Math.cos(phi) - 45 // geser ke belakang
+        const z = r * Math.cos(phi) - 45 // push the field back
 
         const i3 = i * 3
         positions[i3] = x
         positions[i3 + 1] = y
         positions[i3 + 2] = z
 
-        // Warna: campuran biru–ungu keemasan
+        // Color mix: blue/purple with warm highlights
         const h = hueCenter + (Math.random() - 0.5) * hueSpread
         const s = satBase + Math.random() * 0.25
         const l = lightBase + Math.random() * 0.3
@@ -80,11 +86,11 @@ const StarField: React.FC<StarFieldProps> = ({ isMobile, reduceMotion }) => {
       farPositions: far.positions,
       farColors: far.colors,
     }
-  }, []) // kalau nanti mau responsif ke isMobile, ini harus [isMobile]
+  }, []) // If you want this to react to isMobile, change deps to [isMobile]
 
-  // Animasi rotasi + nebula
+  // Rotation animation + nebula time uniforms
   useFrame((state, delta) => {
-    // === 1. Rotasi bintang diperlambat pakai STAR_SPEED ===
+    // === 1) Star rotation slowed down by STAR_SPEED ===
     const rotSlow = (reduceMotion ? 0.02 : 0.04) * STAR_SPEED
     const rotFast = (reduceMotion ? 0.06 : 0.12) * STAR_SPEED
 
@@ -95,7 +101,7 @@ const StarField: React.FC<StarFieldProps> = ({ isMobile, reduceMotion }) => {
       farGroup.current.rotation.y += delta * rotSlow
     }
 
-    // === 2. Nebula time – boleh tetap cepat, tidak pakai STAR_SPEED ===
+    // === 2) Nebula time (kept separate from STAR_SPEED) ===
     const t = state.clock.getElapsedTime() * 0.2
 
     if (nebulaMat1.current) {
@@ -158,7 +164,7 @@ const StarField: React.FC<StarFieldProps> = ({ isMobile, reduceMotion }) => {
 
   return (
     <group>
-      {/* Lapisan bintang jauh: dense, soft */}
+      {/* Far star layer: dense and soft */}
       <group ref={farGroup}>
         <Points
           positions={farPositions}
@@ -178,7 +184,7 @@ const StarField: React.FC<StarFieldProps> = ({ isMobile, reduceMotion }) => {
         </Points>
       </group>
 
-      {/* Lapisan bintang dekat: lebih terang, lebih sedikit */}
+      {/* Near star layer: brighter and slightly larger */}
       <group ref={nearGroup}>
         <Points
           positions={nearPositions}
@@ -198,7 +204,7 @@ const StarField: React.FC<StarFieldProps> = ({ isMobile, reduceMotion }) => {
         </Points>
       </group>
 
-      {/* Nebula “asep” di belakang semua */}
+      {/* Smoky nebula planes behind everything */}
       <group position={[0, 0, -25]}>
         <mesh rotation={[0, 0.2, 0]}>
           <planeGeometry args={[60, 30, 64, 64]} />

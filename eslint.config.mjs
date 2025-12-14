@@ -1,5 +1,11 @@
 // @ts-check
 
+/**
+ * ESLint configuration for the project (JavaScript + TypeScript).
+ * - Uses ESLint recommended rules plus TypeScript-ESLint recommended presets for .ts/.tsx files.
+ * - Adds small project-specific tweaks (ignore dist/node_modules, and rely on TS for unused-vars with a "_" args exception).
+ */
+
 import eslint from '@eslint/js'
 import tseslint from 'typescript-eslint'
 

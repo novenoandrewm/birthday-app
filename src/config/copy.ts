@@ -1,4 +1,11 @@
 // src/config/copy.ts
+
+/**
+ * Central copy/content configuration for the whole experience.
+ * - Defines all on-screen text for the hero + each chapter (titles and paragraphs).
+ * - Supports simple personalization by pulling the recipient name from personalization.ts (with an optional override).
+ */
+
 import { PERSON } from './personalization'
 
 export type SectionCopy = {
@@ -35,8 +42,8 @@ export const COPY: {
     title: 'Part 1',
     paragraphs: [
       'fill it yourself',
-      'Tulis paragraf Part 1 kamu di sini.',
-      'Kalau mau tambah, ini paragraf kedua (opsional).',
+      'Write your Part 1 paragraph here.',
+      'If you want to add, here is the second paragraph (optional).',
     ],
   },
 
@@ -44,20 +51,17 @@ export const COPY: {
     title: 'Part 2',
     paragraphs: [
       'Fill it yourself',
-      'Tulis isi Part 2 kamu di sini.',
-      'Kalau mau tambah, ini paragraf kedua (opsional).',
+      'Write your Part 2 content here.',
+      'If you want to add, here is the second paragraph (optional).',
     ],
   },
 
-  // ✅ Closing sekarang layout-nya sama seperti Part 1/2:
-  // line 0 = subtitle (muncul di HUD)
-  // sisanya = muncul di panel kiri-bawah
   finale: {
     title: 'Closing',
     paragraphs: [
-      'Kalimat penutup',
-      'Tulis penutup yang paling kamu di sini.',
-      'Boleh tambah paragraf terakhir yang lebih personal (opsional).',
+      'Closing sentence',
+      'Write your most personal closing here.',
+      'You may add a more personal final paragraph (optional).',
     ],
   },
 }

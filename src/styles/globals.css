@@ -1,3 +1,8 @@
+/* Global styles for layout, scrolling, and UI overlays.
+ * - Defines full-height sections, scroll snap behavior, and a fixed 3D canvas layer behind the HTML.
+ * - Styles the HUD, chapter text panel, recipient tag, and navigation buttons as readable glass-like overlays.
+ */
+
 @import './theme.css';
 
 *,
@@ -64,11 +69,11 @@ body {
   z-index: 1;
 }
 
-/* Tiap “page” = 1 layar */
+/* Each “page” = one viewport height */
 .chapter {
   min-height: 100vh;
   width: 100%;
-  scroll-margin-top: 18vh; /* biar scrollIntoView nggak ketutup HUD */
+  scroll-margin-top: 18vh; /* Prevent scrollIntoView from being hidden under the HUD */
 }
 
 /* ==========
@@ -96,7 +101,7 @@ body {
 }
 
 .hud-title {
-  /* ✅ sedikit dikecilkan */
+  /* Slightly reduced title size for better balance */
   font-size: clamp(2.55rem, 4.2vw, 3.15rem);
   font-weight: 700;
   line-height: 1.05;
@@ -128,9 +133,9 @@ body {
   opacity: 0.92;
 }
 
-/* =====================
-   Panel teks kiri-bawah
-   ===================== */
+/* ===========================
+   Bottom-left chapter text panel
+   =========================== */
 .chapter-panel {
   position: fixed;
   left: clamp(1.25rem, 6vw, 3rem);
@@ -150,7 +155,7 @@ body {
 
 .chapter-panel-text {
   margin: 0;
-  font-size: 1.02rem; /* closing juga ikut rapi & lebih kecil dari judul */
+  font-size: 1.02rem; /* Slightly smaller body text for readability */
   line-height: 1.55;
   opacity: 0.92;
 }
@@ -166,7 +171,7 @@ body {
 }
 
 /* ==========================
-   Nama penerima kanan bawah
+   Recipient name (bottom-right)
    ========================== */
 .recipient-tag {
   position: fixed;
@@ -174,7 +179,7 @@ body {
   bottom: clamp(1rem, 4vh, 2.2rem);
   z-index: 20;
 
-  /* ✅ diperbesar lagi */
+  /* Enlarged for better emphasis */
   font-size: clamp(1.15rem, 1.7vw, 1.45rem);
   letter-spacing: 0.45em;
   font-weight: 500;
@@ -245,4 +250,23 @@ body {
     bottom: 1.1rem;
     letter-spacing: 0.35em;
   }
+}
+
+/* ===== Smooth swap animation for HUD + Panel (no pop) ===== */
+@keyframes fadeUpIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* This class is used with key={activeId} on wrappers to replay the animation */
+.swap-anim {
+  animation: fadeUpIn 360ms ease both;
 }

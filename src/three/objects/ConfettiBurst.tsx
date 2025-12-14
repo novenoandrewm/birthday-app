@@ -1,3 +1,9 @@
+/**
+ * Confetti burst effect triggered by the finale interaction.
+ * - Spawns multiple deterministic “random” confetti pieces so positions/velocities are stable per index.
+ * - When active is true, each piece follows a simple ballistic arc with spin and auto-hides after ~3 seconds to save CPU.
+ */
+
 import React, { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import type { Mesh } from 'three'
@@ -9,7 +15,7 @@ type ConfettiPieceProps = {
 
 const PALETTE = ['#fb7185', '#f97316', '#22c55e', '#38bdf8', '#a855f7']
 
-// Pseudo-random deterministik berdasarkan index, supaya posisi tiap piece konsisten
+// Deterministic pseudo-random generator based on index (keeps each piece consistent)
 const randFromIndex = (index: number, min: number, max: number) => {
   const x = Math.sin(index * 127.1) * 43758.5453123
   const n = x - Math.floor(x)
@@ -20,7 +26,7 @@ const ConfettiPiece: React.FC<ConfettiPieceProps> = ({ index, active }) => {
   const ref = useRef<Mesh | null>(null)
   const startTimeRef = useRef<number | null>(null)
 
-  // Parameter “random” tapi deterministik
+  // “Random” parameters, but deterministic per index
   const baseX = randFromIndex(index * 3.1, -0.6, 0.6)
   const baseZ = randFromIndex(index * 5.7, -0.6, 0.6)
   const baseY = randFromIndex(index * 7.9, 1.3, 1.8)
@@ -38,7 +44,7 @@ const ConfettiPiece: React.FC<ConfettiPieceProps> = ({ index, active }) => {
     if (!ref.current) return
 
     if (!active) {
-      // Sebelum ditiup: sembunyikan konfeti dan reset timer
+      // Before activation: hide confetti and reset the timer
       ref.current.visible = false
       startTimeRef.current = null
       return
@@ -51,7 +57,7 @@ const ConfettiPiece: React.FC<ConfettiPieceProps> = ({ index, active }) => {
     }
 
     const t = clock.getElapsedTime() - startTimeRef.current
-    const g = 2 // gravitasi “bohong”
+    const g = 2 // “fake” gravity for a nicer arc
 
     const x = baseX + velX * t
     const z = baseZ + velZ * t
@@ -61,7 +67,7 @@ const ConfettiPiece: React.FC<ConfettiPieceProps> = ({ index, active }) => {
     ref.current.rotation.x += rotSpeedX * delta
     ref.current.rotation.y += rotSpeedY * delta
 
-    // Setelah ~3 detik, berhenti update supaya tidak buang-buang CPU
+    // After ~3 seconds, stop rendering to avoid wasting CPU/GPU
     if (t > 3.0) {
       ref.current.visible = false
     }

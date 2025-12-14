@@ -1,6 +1,11 @@
 // src/hooks/useMediaQuery.ts
 import { useEffect, useState } from 'react'
 
+/**
+ * React hook that returns whether a given CSS media query currently matches.
+ * - Uses window.matchMedia() and updates state on query changes.
+ * - Safe for SSR by early-returning when window is undefined.
+ */
 export const useMediaQuery = (query: string): boolean => {
   const [matches, setMatches] = useState(false)
 
@@ -15,10 +20,10 @@ export const useMediaQuery = (query: string): boolean => {
       setMatches(event.matches)
     }
 
-    // nilai awal
+    // Initial value
     setMatches(mql.matches)
 
-    // listen perubahan
+    // Listen for changes
     mql.addEventListener('change', handleChange)
 
     return () => {

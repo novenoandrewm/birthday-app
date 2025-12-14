@@ -1,3 +1,9 @@
+/**
+ * Simple decorative flower ring made of pastel “petal” spheres.
+ * - Procedurally places small spheres in a circular pattern around the center.
+ * - Uses a repeating pastel color palette to create a soft romantic accent.
+ */
+
 // src/three/objects/FlowerRing.tsx
 import React from 'react'
 

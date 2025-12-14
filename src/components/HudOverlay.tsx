@@ -1,4 +1,11 @@
 // src/components/HudOverlay.tsx
+
+/**
+ * Top HUD overlay showing the global hero title and the current chapter heading.
+ * - Displays a fixed hero eyebrow/title plus a dynamic line (main/sub) based on activeId (and hasBlown for finale state).
+ * - Uses swap-anim + key={activeId} to replay a smooth transition whenever the active section changes.
+ */
+
 import React, { useMemo } from 'react'
 import { COPY } from '../config/copy'
 
@@ -20,7 +27,6 @@ const HudOverlay: React.FC<Props> = ({ activeId, hasBlown }) => {
       return { main: COPY.reflection.title, sub: COPY.reflection.paragraphs[0] ?? '' }
     }
     if (activeId === 'cake-finale') {
-      // layout sama seperti Part 1/2
       const sub = COPY.finale.paragraphs[0] ?? ''
       return { main: COPY.finale.title, sub: hasBlown ? sub : sub }
     }
@@ -30,7 +36,7 @@ const HudOverlay: React.FC<Props> = ({ activeId, hasBlown }) => {
   return (
     <>
       <header className="hud" aria-label="Birthday HUD">
-        <div className="hud-top">
+        <div className="hud-top swap-anim" key={activeId}>
           {hero.eyebrow && <div className="hud-eyebrow">{upper(hero.eyebrow)}</div>}
           {hero.title && <div className="hud-title">{upper(hero.title)}</div>}
         </div>
@@ -44,7 +50,7 @@ const HudOverlay: React.FC<Props> = ({ activeId, hasBlown }) => {
         )}
       </header>
 
-      {/* Nama penerima: selalu tampil (dan bisa dibesarkan dari CSS) */}
+      {/* Recipient name: always visible (and can be enlarged from CSS) */}
       <div className="recipient-tag" aria-label="Recipient name">
         {upper(hero.recipient)}
       </div>

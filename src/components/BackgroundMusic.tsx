@@ -1,4 +1,11 @@
 // src/components/BackgroundMusic.tsx
+
+/**
+ * Background music controller for the experience.
+ * - Attempts to autoplay the theme on mount (handles browser autoplay restrictions).
+ * - Provides a fixed toggle button (MUSIC ON/OFF) so users can start/stop audio manually.
+ */
+
 import React, { useEffect, useRef, useState } from 'react'
 
 const MUSIC_SRC = '/audio/birthday-theme.mp3'

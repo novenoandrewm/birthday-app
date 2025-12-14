@@ -8,9 +8,9 @@ type Options = {
 }
 
 /**
- * Reveal ketika elemen sudah "cukup" masuk viewport.
- * Dibuat lebih forgiving supaya saat scrollTo (NavigationButtons)
- * konten langsung muncul tanpa harus scroll lagi.
+ * Reveals an element once it enters the viewport (IntersectionObserver-based).
+ * - Uses a forgiving threshold/rootMargin so content appears immediately after programmatic scrollTo navigation.
+ * - Supports "once" mode (default) to reveal only the first time the element becomes visible.
  */
 export function useRevealOnScroll<T extends HTMLElement>(
   options: Options = {}

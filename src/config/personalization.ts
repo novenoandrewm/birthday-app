@@ -1,18 +1,26 @@
 // src/config/personalization.ts
+
+/**
+ * Personalization data used across the app (names, birthday, pronouns, and traits).
+ * - Keep this as the single place to update recipient details.
+ * - Values here are referenced by copy.ts and UI components.
+ */
+
 export type Pronouns = 'she/her' | 'he/him' | 'they/them'
+export type ISODateString = `${number}-${number}-${number}` // expects "YYYY-MM-DD" shape
 
 export interface PersonConfig {
   name: string
-  nickname: string
-  birthday: string // "2025-12-31"
+  nickname?: string
+  birthday: ISODateString
   pronouns: Pronouns
-  relationship: string // misal: "my partner", "my best friend"
-  specialTraits: string[] // hal-hal yang kamu suka dari dia
+  relationship: string
+  specialTraits: readonly string[]
 }
 
 export const PERSON: PersonConfig = {
-  name: 'Nama Penerima',
-  nickname: 'Panggilan khusus jika ada',
+  name: 'Recipient Name',
+  nickname: 'Your special nickname', // optional; you can remove this line if not needed
   birthday: '2025-12-31',
   pronouns: 'she/her',
   relationship: 'my favourite person in this universe',

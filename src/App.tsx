@@ -1,5 +1,11 @@
+/**
+ * Main app orchestrator that wires together sections, UI overlays, and the 3D scene.
+ * - Tracks scroll progress (for 3D animation), active section (for HUD/ChapterPanel), and finale state (hasBlown).
+ * - Uses an activeOverride to update HUD/panel immediately on Next/Prev clicks, then clears it after smooth scrolling finishes.
+ */
+
 // src/App.tsx
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import HeroIntro from './sections/HeroIntro'
 import RomanticMessage from './sections/RomanticMessage'
 import ReflectionPledge from './sections/ReflectionPledge'
@@ -23,15 +29,10 @@ const App: React.FC = () => {
   const sectionIds = useMemo(() => SECTIONS.map((s) => s.id), [])
   const observedActiveId = useActiveSection(sectionIds)
 
-  // override supaya pas klik tombol NEXT/PREV, HUD+panel langsung ganti
+  // Override so HUD/panel updates immediately on button navigation
   const [activeOverride, setActiveOverride] = useState<string | null>(null)
-  const activeId = activeOverride ?? observedActiveId
 
-  useEffect(() => {
-    if (activeOverride && observedActiveId === activeOverride) {
-      setActiveOverride(null)
-    }
-  }, [observedActiveId, activeOverride])
+  const activeId = activeOverride ?? observedActiveId
 
   return (
     <div className="app-root">
@@ -43,6 +44,7 @@ const App: React.FC = () => {
         onBlow={() => setHasBlown(true)}
       />
 
+      {/* NOTE: Later we can refine transitions via CSS (Step 4) */}
       <HudOverlay activeId={activeId} hasBlown={hasBlown} />
       <ChapterPanel activeId={activeId} hasBlown={hasBlown} />
 
@@ -57,6 +59,10 @@ const App: React.FC = () => {
         sections={SECTIONS}
         activeId={activeId}
         onNavigate={(id) => setActiveOverride(id)}
+        onScrollEnd={(id) => {
+          // After scrolling completes, release the override
+          if (activeOverride === id) setActiveOverride(null)
+        }}
       />
     </div>
   )

@@ -1,3 +1,9 @@
+/**
+ * Decorative balloon ring that frames the cake scene.
+ * - Procedurally generates balloon positions/colors in a left-right ring layout and animates a gentle bobbing motion.
+ * - Uses reduceMotion to disable floating animation for accessibility/performance while keeping the balloons visible.
+ */
+
 // src/three/objects/BalloonsRing.tsx
 import React, { useMemo, useRef } from 'react'
 import type { FC } from 'react'
@@ -69,13 +75,13 @@ const BalloonsRing: FC<BalloonsRingProps> = ({ radius, count, reduceMotion }) =>
     <group ref={group}>
       {balloons.map((b, i) => (
         <group key={i} position={b.basePosition}>
-          {/* tali */}
+          {/* String */}
           <mesh position={[0, -0.65, 0]}>
             <cylinderGeometry args={[0.01, 0.01, 1.3, 8]} />
             <meshStandardMaterial color="#020617" roughness={0.9} />
           </mesh>
 
-          {/* badan balon */}
+          {/* Balloon body */}
           <mesh position={[0, 0.15, 0]} castShadow>
             <sphereGeometry args={[0.19, 24, 24]} />
             <meshStandardMaterial

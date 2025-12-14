@@ -1,3 +1,9 @@
+/**
+ * Stylized 3D birthday cake model with a simple “blow the candle” interaction.
+ * - Builds a multi-tier cake (plate, tiers, frosting rims, cream blobs, front flowers, and a small figurine) using basic geometries.
+ * - Adds subtle floating/rotation animation (disabled when reduceMotion is true) and a pulsing candle flame that can be clicked to trigger onBlow().
+ */
+
 // src/three/objects/BirthdayCake.tsx
 import React, { useRef, useMemo, useState, useLayoutEffect } from 'react'
 import type { FC } from 'react'
@@ -26,7 +32,7 @@ const BirthdayCake: FC<BirthdayCakeProps> = ({ onBlow, reduceMotion }) => {
   const lowerTierRef = useRef<Mesh | null>(null)
   const upperTierRef = useRef<Mesh | null>(null)
 
-  // Sedikit jitter di geometry supaya highlight lebih hidup
+  // Adds a small random vertex jitter so highlights look more organic
   useLayoutEffect(() => {
     const jitter = (mesh: Mesh | null, magnitude: number) => {
       if (!mesh) return
@@ -46,7 +52,7 @@ const BirthdayCake: FC<BirthdayCakeProps> = ({ onBlow, reduceMotion }) => {
     jitter(upperTierRef.current, 0.014)
   }, [])
 
-  // Cream blobs di tepi atas
+  // Cream blobs around the top rim
   const creamBlobs = useMemo(() => {
     const blobs: { position: [number, number, number]; scale: number }[] = []
     const ringRadius = 1.05
@@ -65,7 +71,7 @@ const BirthdayCake: FC<BirthdayCakeProps> = ({ onBlow, reduceMotion }) => {
     return blobs
   }, [])
 
-  // Bunga HANYA di depan kue
+  // Flowers placed only on the front side of the cake
   const frontFlowers = useMemo<FlowerConfig[]>(() => {
     const z = 1.75
     const y = 0.05
@@ -81,13 +87,13 @@ const BirthdayCake: FC<BirthdayCakeProps> = ({ onBlow, reduceMotion }) => {
   useFrame((state) => {
     const t = state.clock.getElapsedTime()
 
-    // Floating halus untuk seluruh kue
+    // Gentle floating/rotation for the whole cake
     if (root.current && !reduceMotion) {
       root.current.rotation.y = Math.sin(t * 0.25) * 0.12
       root.current.position.y = 0.02 + Math.sin(t * 0.9) * 0.03
     }
 
-    // Api lilin berdenyut
+    // Candle flame pulse animation
     if (flameMat.current && isLit) {
       const pulse = 0.6 + Math.sin(t * 12.0) * 0.25
       flameMat.current.emissiveIntensity = 1.4 * pulse
@@ -106,7 +112,7 @@ const BirthdayCake: FC<BirthdayCakeProps> = ({ onBlow, reduceMotion }) => {
 
   return (
     <group ref={root} position={[0, 0, 0]}>
-      {/* Piring kue – gelap untuk kontras */}
+      {/* Cake plate (dark for contrast) */}
       <mesh position={[0, -0.45, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[2.4, 2.6, 0.18, RIM_SEGMENTS]} />
         <meshStandardMaterial
@@ -116,7 +122,7 @@ const BirthdayCake: FC<BirthdayCakeProps> = ({ onBlow, reduceMotion }) => {
         />
       </mesh>
 
-      {/* Tier bawah – buttercream kuning emas */}
+      {/* Lower tier (golden buttercream) */}
       <mesh
         ref={lowerTierRef}
         position={[0, -0.1, 0]}
@@ -131,7 +137,7 @@ const BirthdayCake: FC<BirthdayCakeProps> = ({ onBlow, reduceMotion }) => {
         />
       </mesh>
 
-      {/* Rim frosting bawah – oranye lembut */}
+      {/* Lower frosting rim (soft orange) */}
       <mesh position={[0, 0.36, 0]} castShadow>
         <torusGeometry args={[1.72, 0.09, 18, 80]} />
         <meshStandardMaterial
@@ -143,7 +149,7 @@ const BirthdayCake: FC<BirthdayCakeProps> = ({ onBlow, reduceMotion }) => {
         />
       </mesh>
 
-      {/* Tier atas – pink pastel */}
+      {/* Upper tier (pastel pink) */}
       <mesh
         ref={upperTierRef}
         position={[0, 0.6, 0]}
@@ -158,7 +164,7 @@ const BirthdayCake: FC<BirthdayCakeProps> = ({ onBlow, reduceMotion }) => {
         />
       </mesh>
 
-      {/* Rim frosting atas – biru pastel */}
+      {/* Upper frosting rim (pastel blue) */}
       <mesh position={[0, 0.95, 0]} castShadow>
         <torusGeometry args={[1.12, 0.075, 16, 70]} />
         <meshStandardMaterial
@@ -170,7 +176,7 @@ const BirthdayCake: FC<BirthdayCakeProps> = ({ onBlow, reduceMotion }) => {
         />
       </mesh>
 
-      {/* Cream blobs di tepi atas */}
+      {/* Cream blobs around the top edge */}
       {creamBlobs.map((blob, idx) => (
         <mesh
           key={idx}
@@ -187,7 +193,7 @@ const BirthdayCake: FC<BirthdayCakeProps> = ({ onBlow, reduceMotion }) => {
         </mesh>
       ))}
 
-      {/* Bouquet bunga hanya di depan kue */}
+      {/* Front bouquet decorations */}
       {frontFlowers.map((f, i) => (
         <group key={i} position={f.position}>
           <mesh castShadow>
@@ -201,7 +207,7 @@ const BirthdayCake: FC<BirthdayCakeProps> = ({ onBlow, reduceMotion }) => {
             />
           </mesh>
 
-          {/* batang */}
+          {/* Stem */}
           <mesh position={[0, -f.scale * 0.9, 0]}>
             <cylinderGeometry
               args={[f.scale * 0.2, f.scale * 0.16, f.scale * 1.8, 10]}
@@ -209,7 +215,7 @@ const BirthdayCake: FC<BirthdayCakeProps> = ({ onBlow, reduceMotion }) => {
             <meshStandardMaterial color="#16a34a" roughness={0.7} />
           </mesh>
 
-          {/* dua daun kecil */}
+          {/* Two small leaves */}
           <mesh position={[f.scale * 0.3, -f.scale * 0.9, 0]}>
             <sphereGeometry args={[f.scale * 0.18, 10, 10]} />
             <meshStandardMaterial color="#16a34a" roughness={0.7} />
@@ -221,7 +227,7 @@ const BirthdayCake: FC<BirthdayCakeProps> = ({ onBlow, reduceMotion }) => {
         </group>
       ))}
 
-      {/* Figurine di atas kue */}
+      {/* Small figurine on top of the cake */}
       <group position={[0, 1.0, 0]}>
         <mesh position={[0, figurineHeight * 0.35, 0]} castShadow>
           <cylinderGeometry args={[0.16, 0.18, figurineHeight * 0.6, 24]} />
@@ -245,7 +251,7 @@ const BirthdayCake: FC<BirthdayCakeProps> = ({ onBlow, reduceMotion }) => {
         </mesh>
       </group>
 
-      {/* Lilin */}
+      {/* Candle */}
       <group position={[0, 1.1, 0]}>
         <mesh castShadow>
           <cylinderGeometry args={[0.07, 0.07, 0.35, 18]} />
