@@ -10,11 +10,25 @@ type Props = {
 
 const clamp = (n: number, min: number, max: number) => Math.min(Math.max(n, min), max)
 
+// Hitung scrollMarginTop elemen (bisa dalam px atau vh).
 const scrollToId = (id: string) => {
   const el = document.getElementById(id)
   if (!el) return
-  // CSS scroll-margin-top di .chapter akan ngasih “offset” otomatis
-  el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+
+  // ambil nilai scroll-margin-top yang sudah didefinisikan di CSS
+  const style = window.getComputedStyle(el)
+  const marginTopValue =
+    style.scrollMarginTop || style.getPropertyValue('scroll-margin-top') || '0px'
+  let offset = 0
+  if (marginTopValue.endsWith('vh')) {
+    offset = (parseFloat(marginTopValue) / 100) * window.innerHeight
+  } else if (marginTopValue.endsWith('px')) {
+    offset = parseFloat(marginTopValue)
+  }
+
+  // scroll manual dengan offset supaya section selalu muncul tepat di bawah HUD
+  const top = el.getBoundingClientRect().top + window.scrollY - offset
+  window.scrollTo({ top, behavior: 'smooth' })
 }
 
 const NavigationButtons: React.FC<Props> = ({ sections, activeId, onNavigate }) => {

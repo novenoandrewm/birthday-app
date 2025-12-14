@@ -27,6 +27,13 @@ body {
   position: relative;
 }
 
+.app-main {
+  scroll-snap-type: y mandatory;
+}
+.chapter {
+  scroll-snap-align: start;
+}
+
 /* ==============
    3D CANVAS LAYER
    ============== */

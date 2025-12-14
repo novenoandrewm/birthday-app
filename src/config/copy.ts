@@ -13,8 +13,7 @@ export type HeroCopy = {
   recipient?: string
 }
 
-// ✅ GANTI INI untuk paksa nama dari copy.ts (paling simpel)
-const RECIPIENT_OVERRIDE = 'Nama Penerima Kamu'
+const RECIPIENT_OVERRIDE = 'Reciepient Name'
 
 const personName = (PERSON?.name ?? '').trim()
 const recipient = (RECIPIENT_OVERRIDE ?? '').trim() || personName || 'Recipient Name'
@@ -29,7 +28,7 @@ export const COPY: {
     eyebrow: 'Birthday Moment',
     title: 'Happy Birthday',
     subtitle: 'Today is your special day!',
-    recipient: 'Recipient Name', 
+    recipient: recipient,
   },
 
   romantic: {
